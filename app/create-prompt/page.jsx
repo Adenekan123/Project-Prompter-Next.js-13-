@@ -6,11 +6,14 @@ import { useRouter } from "next/navigation";
 
 import Form from "@components/Form";
 
+import { useDispatch } from "react-redux";
+import { prompt_creating } from "@store/prompt/prompt.slice";
+
 const CreatePrompt = () => {
+  const dispatch = useDispatch();
   const router = useRouter();
   const {data:session} = useSession();
 
-  const [submitting, setSubmitting] = useState(false);
   const [post, setpost] = useState({
     prompt: "",
     tag: "",
@@ -18,8 +21,7 @@ const CreatePrompt = () => {
 
   const createPrompt = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
-
+    dispatch(prompt_creating(true))
     try {
       const response = await fetch('/api/prompt/new',{
         method:"POST",
@@ -37,7 +39,7 @@ const CreatePrompt = () => {
       console.log(error);
 
     }finally{
-      setSubmitting(false);
+      dispatch(prompt_creating(false))
     }
   };
 
@@ -46,7 +48,6 @@ const CreatePrompt = () => {
       type="Create"
       post={post}
       setpost={setpost}
-      submitting={submitting}
       handleSubmit={createPrompt}
     />
   );

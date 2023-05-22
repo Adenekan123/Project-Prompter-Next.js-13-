@@ -1,7 +1,10 @@
 import React from "react";
 import Link from "next/link";
 
-const Form = ({ type, post, setpost, submitting, handleSubmit }) => {
+import { useSelector } from "react-redux";
+
+const Form = ({ type, post, setpost, handleSubmit }) => {
+  const {creating:submitting} = useSelector((state)=> state.prompts)
   return (
     <section className="w-full max-w-full flex-start flex-col">
       <h1 className="head_text text-left">

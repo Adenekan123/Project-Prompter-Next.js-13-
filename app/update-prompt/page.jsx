@@ -2,15 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useRouter,useSearchParams } from "next/navigation";
+import { useDispatch} from "react-redux";
+
+import { prompt_creating } from "@store/prompt/prompt.slice";
 
 import Form from "@components/Form";
 
 const EditPrompt = () => {
+  const dispatch = useDispatch();
+
   const router = useRouter();
 const searchParams = useSearchParams();
 const promptId = searchParams.get('id');
 
-  const [submitting, setSubmitting] = useState(false);
   const [post, setpost] = useState({
     prompt: "",
     tag: "",
@@ -30,7 +34,7 @@ const promptId = searchParams.get('id');
 
   const updatePrompt = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
+    dispatch(prompt_creating(true));
 
     if(!promptId) return alert("Prompt ID not found!");
 
@@ -50,7 +54,7 @@ const promptId = searchParams.get('id');
       console.log(error);
 
     }finally{
-      setSubmitting(false);
+      dispatch(prompt_creating(false));
     }
   };
 
@@ -59,7 +63,6 @@ const promptId = searchParams.get('id');
       type="Edit"
       post={post}
       setpost={setpost}
-      submitting={submitting}
       handleSubmit={updatePrompt}
     />
   );

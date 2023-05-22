@@ -1,7 +1,13 @@
+"use client"
+
 import "@styles/globals.css";
+
+import { Provider as ReduxProvider } from "react-redux";
 
 import Nav from "@components/Nav";
 import Provider from "@components/Provider";
+
+import { store } from "@store/store";
 
 export const metadat = {
   title: "Promptopia",
@@ -18,8 +24,10 @@ const RootLayout = ({ children }) => {
           </div>
 
           <main className="app">
-            <Nav />
-            {children}
+            <ReduxProvider store={store}>
+              <Nav />
+              {children}
+            </ReduxProvider>
           </main>
         </Provider>
       </body>

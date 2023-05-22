@@ -2,11 +2,13 @@
 
 import { useState,useEffect } from "react";
 import PromptCard from "./PromptCard";
-
+import { useDispatch } from "react-redux";
+import { prompts_fetch_pending,prompts_fetch_success,prompts_fetch_failure } from "@store/prompt/prompt.slice";
+import { useSelector } from "react-redux";
 const PromptCardList = ({data,handleTagClick}) =>{
 
   return <div className="mt-16 prompt_layout">
-    { !data.length ? <div>Loading...</div>: data.map((post)=> <PromptCard key={post._id} post={post} handleTagClick={handleTagClick}  />)}
+    {data.map((post)=> <PromptCard key={post._id} post={post} handleTagClick={handleTagClick}  />)}
   </div>
 }
 
@@ -14,18 +16,21 @@ const Feed = () => {
   const [searchText, setSearchText] = useState('');
   const [searchResult, setsearchResult] = useState([]);
   const [timeoutId, seTtimeoutId] = useState(null);
-  const [posts, setPosts] = useState([])
+  
+  const {prompts:posts,isLoading,error} = useSelector((state)=> state.prompts)
 
-
+  const dispatch = useDispatch();
+  
   const handleSearchChange = (e) =>{
     setSearchText(e.target.value);
   }
 
   useEffect(()=>{
     const fetchPosts = async () =>{
+      dispatch(prompts_fetch_pending());
       const response = await fetch('/api/prompt');
       const data = await response.json();
-      setPosts(data);
+      dispatch(prompts_fetch_success(data));
     }
     fetchPosts();
   },[]);
@@ -47,7 +52,7 @@ const Feed = () => {
       <form action="" className="relative w-full flex-center">
         <input type="text" placeholder="Search for a tag or a username"  value={searchText} onChange={handleSearchChange} required className="search_input peer"/>
       </form>
-      <PromptCardList data={searchResult} handleTagClick={(tag)=>{setSearchText(tag)}} />
+      {isLoading ? <div>Loading...</div>:<PromptCardList loading={isLoading} data={searchResult} handleTagClick={(tag)=>{setSearchText(tag)}} />}
     </scetion>
   )
 }

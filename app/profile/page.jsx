@@ -2,14 +2,17 @@
 import { useState,useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useDispatch,useSelector } from "react-redux";
+import { prompts_fetch_pending,prompts_fetch_success,prompts_fetch_failure ,prompt_delete} from "@store/prompt/prompt.slice";
 
 import Profile from "@components/Profile";
 
 const MyProfile = () => {
-    const [posts, setPosts] = useState([]);
-    const [loading,setLoading] = useState(false);
+  const dispatch = useDispatch();
     const {data:session} = useSession();
     const router = useRouter();
+
+    const {isLoading:loading,prompts:posts} = useSelector((state)=> state.prompts)
 
     const handleEdit = (post) => {
           router.push(`/update-prompt?id=${post._id}`);
@@ -22,8 +25,7 @@ const MyProfile = () => {
           await fetch(`/api/prompt/${post._id.toString()}`,{
             method:"DELETE"
           });
-          const filteredPost = posts.filter((p)=> p._id !== post._id);
-          setPosts(filteredPost);
+          dispatch(prompt_delete(post))
         } catch (error) {
           console.log(error)
         }
@@ -32,11 +34,11 @@ const MyProfile = () => {
 
     useEffect(()=>{
         const fetchPosts = async () =>{
-          setLoading(true);
+          dispatch(prompts_fetch_pending())
           const response = await fetch(`/api/users/${session?.user.id}/posts`);
           const data = await response.json();
-          setPosts(data);
-          setLoading(false);
+          dispatch(prompts_fetch_success(data))
+
         }
        if(session?.user.id) fetchPosts();
       },[])
